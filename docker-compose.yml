@@ -1,0 +1,146 @@
+version: "3.8"
+
+services:
+  zookeeper:
+    image: wurstmeister/zookeeper
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    networks:
+      - eplnet
+
+  kafka:
+    image: wurstmeister/kafka
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:29092,PLAINTEXT_HOST://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_BROKER_ID: 1
+    depends_on:
+      - zookeeper
+    networks:
+      - eplnet
+
+  hadoop-namenode:
+    image: bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8
+    container_name: namenode
+    environment:
+      - CLUSTER_NAME=hadoop-cluster
+    ports:
+      - "9870:9870"
+    volumes:
+      - hadoop_namenode:/hadoop/dfs/name
+    restart: unless-stopped
+    networks:
+      - eplnet
+
+  hadoop-datanode:
+    image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
+    container_name: datanode
+    environment:
+      - CLUSTER_NAME=hadoop-cluster
+      - CORE_CONF_fs_defaultFS=hdfs://namenode:8020
+    ports:
+      - "9864:9864"
+    volumes:
+      - hadoop_datanode:/hadoop/dfs/data
+    depends_on:
+      - hadoop-namenode
+    restart: unless-stopped
+    networks:
+      - eplnet
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: epl_db
+    restart: unless-stopped
+    networks:
+      - eplnet
+
+  cassandra:
+    image: cassandra:4.1
+    container_name: cassandra
+    ports:
+      - "9042:9042"
+    restart: unless-stopped
+    networks:
+      - eplnet
+
+  spark-master:
+    image: bde2020/spark-master:3.1.1-hadoop3.2
+    container_name: spark-master
+    environment:
+      - SPARK_MODE=master
+      - INIT_DAEMON_STEP=setup_spark
+      - SPARK_LOCAL_HOSTNAME=spark-master
+    ports:
+      - "8080:8080"
+      - "7077:7077"
+    volumes:
+      - ./spark/jobs:/spark/jobs
+      - ./spark/jars:/spark/jars
+      - shared_data:/shared_data
+    depends_on:
+      - kafka
+      - zookeeper
+    restart: unless-stopped
+    networks:
+      - eplnet
+
+  spark-worker:
+    image: bde2020/spark-worker:3.1.1-hadoop3.2
+    container_name: spark-worker
+    environment:
+      - SPARK_MASTER=spark://spark-master:7077
+    depends_on:
+      - spark-master
+    volumes:
+      - shared_data:/shared_data
+    restart: unless-stopped
+    networks:
+      - eplnet
+
+  recommender:
+    image: python:3.9-slim
+    container_name: recommender
+    working_dir: /app
+    volumes:
+      - ./recommender:/app
+      - shared_data:/shared_data
+    command: tail -f /dev/null
+    depends_on:
+      - spark-master
+    restart: unless-stopped
+    networks:
+      - eplnet
+
+  visualization:
+    image: grafana/grafana:latest
+    container_name: visualization
+    ports:
+      - "3000:3000"
+    volumes:
+      - shared_data:/shared_data
+    depends_on:
+      - mysql
+    restart: unless-stopped
+    networks:
+      - eplnet
+
+volumes:
+  hadoop_namenode:
+  hadoop_datanode:
+  shared_data:
+
+networks:
+  eplnet:

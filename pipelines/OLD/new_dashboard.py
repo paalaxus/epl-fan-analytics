@@ -148,22 +148,22 @@ st.write(
 live_df = load_mysql_live()
 hist_df = load_cassandra_history()
 
-tab1, tab2, tab3 = st.tabs(["🔴 Live (MySQL)", "📦 Historical (Cassandra)", "⭐ Recommendations"])
+tab1, tab2, tab3 = st.tabs(["🔴 Live", "📦 Historical", "⭐ Recommendations"])
 
 # -------------------------------------------------
 # TAB 1: LIVE VIEW (MySQL)
 # -------------------------------------------------
 with tab1:
-    st.subheader("Live Kafka Stream (via MySQL)")
+    st.subheader("Live Data")
     if live_df.empty:
-        st.warning("No live data yet. Make sure your producer and consumer_dual.py are running.")
+        st.warning("No live data yet. Make sure your producer and new_consumer.py are running.")
     else:
         col1, col2, col3 = st.columns(3)
         total_rev = live_df["revenue"].sum()
         total_tx = len(live_df)
         man_utd_tx = (live_df["team"] == "Man Utd").sum()
 
-        col1.metric("Total Revenue (live sample)", f"${total_rev:,.2f}")
+        col1.metric("Total Revenue (live)", f"${total_rev:,.2f}")
         col2.metric("Transactions (last 500)", total_tx)
         col3.metric("Man Utd Transactions", man_utd_tx)
 
@@ -189,7 +189,7 @@ with tab1:
 with tab2:
     st.subheader("Historical / Scalable Storage (Cassandra)")
     if hist_df.empty:
-        st.warning("No data in Cassandra yet. Let your consumer_dual.py run a bit.")
+        st.warning("No data in Cassandra yet. Let your new_consumer.py run a bit.")
     else:
         st.write("Below is an aggregate view built from **fan_sales_cass** in Cassandra.")
 

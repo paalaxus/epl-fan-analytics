@@ -8,4 +8,4 @@ if [ -d "../epl_venv" ]; then
   source ../epl_venv/bin/activate
 fi
 
-streamlit run new_dashboard.py --server.port=8501
+streamlit run newest_dashboard.py --server.port=8501

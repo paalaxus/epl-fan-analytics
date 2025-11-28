@@ -32,7 +32,7 @@ except Error as e:
 
 mysql_insert = """
 INSERT INTO fan_sales (
-    transaction_id, event_ts, fan_id, team, city, country,
+    transaction_id, event_ts, fan_id, team, country,
     product_name, unit_price, quantity
 ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)
 """
@@ -45,7 +45,7 @@ try:
     cass_session = cluster.connect("epl")
     cass_insert = cass_session.prepare("""
         INSERT INTO fan_sales_cass (
-            transaction_id, event_ts, fan_id, team, city, country,
+            transaction_id, event_ts, fan_id, team, country,
             product_name, unit_price, quantity
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     """)
@@ -70,7 +70,6 @@ for msg in consumer:
             event["event_ts"],
             event["fan_id"],
             event["team"],
-            event["city"],
             event["country"],
             event["product_name"],
             event["unit_price"],
@@ -90,7 +89,6 @@ for msg in consumer:
                 event["event_ts"],
                 event["fan_id"],
                 event["team"],
-                event["city"],
                 event["country"],
                 event["product_name"],
                 event["unit_price"],

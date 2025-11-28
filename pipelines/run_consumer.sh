@@ -9,4 +9,4 @@ if [ -d "../epl_venv" ]; then
   source ../epl_venv/bin/activate
 fi
 
-python3 new_consumer.py
+python3 newest_consumer.py

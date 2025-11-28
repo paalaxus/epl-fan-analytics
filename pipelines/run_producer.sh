@@ -9,4 +9,4 @@ if [ -d "../epl_venv" ]; then
   source ../epl_venv/bin/activate
 fi
 
-python3 producer_synthetic_epl.py
+python3 new_producer.py

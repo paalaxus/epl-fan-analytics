@@ -35,6 +35,7 @@ services:
       - "9870:9870"
     volumes:
       - hadoop_namenode:/hadoop/dfs/name
+      - /home/kofi/Downloads/EPL_Pipeline/pipelines:/shared
     restart: unless-stopped
     networks:
       - eplnet

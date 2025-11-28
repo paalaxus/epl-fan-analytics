@@ -1,14 +1,14 @@
 from kafka import KafkaConsumer
 import json
-import uuid
 import mysql.connector
 from mysql.connector import Error
 from cassandra.cluster import Cluster
+from hdfs import InsecureClient   # NEW → host-side HDFS API
 
 
-# ======================================================
-#                 KAFKA CONSUMER
-# ======================================================
+# ---------------------------------------
+# Kafka Setup
+# ---------------------------------------
 consumer = KafkaConsumer(
     "FanSalesTopic",
     bootstrap_servers=["localhost:9092"],
@@ -17,10 +17,9 @@ consumer = KafkaConsumer(
     value_deserializer=lambda v: json.loads(v.decode("utf-8"))
 )
 
-
-# ======================================================
-#                 MYSQL SETUP
-# ======================================================
+# ---------------------------------------
+# MySQL Setup
+# ---------------------------------------
 try:
     mysql_conn = mysql.connector.connect(
         host="localhost",
@@ -31,20 +30,19 @@ try:
     mysql_cursor = mysql_conn.cursor()
     print("Connected to MySQL.")
 except Error as e:
-    print(f"❌ MySQL connection error: {e}")
+    print(f"MySQL connection error: {e}")
     exit()
 
 mysql_insert = """
-INSERT IGNORE INTO fan_sales (
+INSERT INTO fan_sales (
     transaction_id, event_ts, fan_id, team, country,
     product_name, unit_price, quantity, image_url, source
 ) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
 """
 
-
-# ======================================================
-#                 CASSANDRA SETUP
-# ======================================================
+# ---------------------------------------
+# Cassandra Setup
+# ---------------------------------------
 try:
     cluster = Cluster(["localhost"])
     cass_session = cluster.connect("epl")
@@ -58,46 +56,41 @@ try:
 
     print("Connected to Cassandra.")
 except Exception as e:
-    print(f"❌ Cassandra connection error: {e}")
+    print(f"Cassandra connection error: {e}")
     exit()
 
+# ---------------------------------------
+# HDFS Setup  (WebHDFS)
+# ---------------------------------------
+hdfs_client = InsecureClient("http://localhost:9870", user="root")
+hdfs_path = "/epl_raw/fan_sales.json"   # HDFS file path
 
-# ======================================================
-#                 LOCAL FILE LOGGING (NO HDFS)
-# ======================================================
 
-LOCAL_LOG = "/home/kofi/Downloads/EPL_Pipeline/pipelines/local_fan_sales.json"
-
-
-def write_to_local(event):
+def write_to_hdfs(event):
     """
-    Write event to a local file instead of HDFS.
-    This avoids all WebHDFS, CLI, and Datanode hostname issues.
+    Append Kafka event to HDFS as JSON line.
     """
     try:
-        with open(LOCAL_LOG, "a") as f:
-            f.write(json.dumps(event) + "\n")
-
-        print(f"  → 🟡 LOCAL LOG OK: {event['transaction_id']}")
+        line = json.dumps(event) + "\n"
+        hdfs_client.write(hdfs_path, data=line, encoding="utf-8", append=True)
+        print(f"  → 🟡 HDFS OK: {event['transaction_id']}")
     except Exception as e:
-        print(f"  ❌ Local Write Error: {e}")
+        print(f"  ❌ HDFS Error: {e}")
 
 
-# ======================================================
-#                 MAIN LOOP
-# ======================================================
-print("\n📥 Listening for Kafka events... (MySQL + Cassandra + LOCAL FILE)\n")
+print("\n📥 Listening for Kafka events (MySQL + Cassandra + HDFS)...\n")
 
+
+# ---------------------------------------
+# Main Consumer Loop
+# ---------------------------------------
 for msg in consumer:
     event = msg.value
     print(f"📦 Received event: {event}")
 
-    # Ensure unique transaction ID
-    if not event.get("transaction_id"):
-        event["transaction_id"] = uuid.uuid4().hex[:12]
-
-    event["source"] = event.get("source", "organic")
-    event["image_url"] = event.get("image_url", "")
+    # defaults
+    source = event.get("source", "organic")
+    image_url = event.get("image_url", "")
 
     # -----------------------------
     # MySQL Insert
@@ -112,8 +105,8 @@ for msg in consumer:
             event["product_name"],
             float(event["unit_price"]),
             int(event["quantity"]),
-            event["image_url"],
-            event["source"]
+            image_url,
+            source
         ))
         mysql_conn.commit()
         print(f"  → ✅ MySQL OK: {event['transaction_id']}")
@@ -135,8 +128,8 @@ for msg in consumer:
                 event["product_name"],
                 float(event["unit_price"]),
                 int(event["quantity"]),
-                event["image_url"],
-                event["source"]
+                image_url,
+                source
             )
         )
         print(f"  → 🟣 Cassandra OK: {event['transaction_id']}")
@@ -144,8 +137,8 @@ for msg in consumer:
         print(f"  ❌ Cassandra Insert Error: {e}")
 
     # -----------------------------
-    # LOCAL WRITE
+    # HDFS Insert
     # -----------------------------
-    write_to_local(event)
+    write_to_hdfs(event)
+    print()
 
-    print()  # spacing

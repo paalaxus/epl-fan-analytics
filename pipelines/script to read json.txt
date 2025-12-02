@@ -1,0 +1,1 @@
+./view_hdfs.sh head /epl_raw/fan_sales.json

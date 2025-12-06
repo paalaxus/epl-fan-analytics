@@ -1,86 +1,124 @@
-# EPL Pipeline - Full Big Data Stack
+# EPL Fan Sales Big Data Pipeline
+A full end-to-end big data project simulating English Premier League (EPL) fan purchase behavior using **Kafka, MySQL, Cassandra, Docker, Streamlit**, and a custom real-time **fan storefront with recommendation engine**.
 
-This project gives you a full EPL fan-sales big data stack with:
+This project demonstrates real-time data engineering, distributed storage, streaming analytics, and applied machine learning-style pattern mining for recommendations.
 
-- Kafka + Zookeeper
-- Spark Master + Worker
-- HDFS NameNode + DataNode
-- Cassandra
-- MySQL
-- Grafana
-- Python recommender container
-- Local Python producer
-- Local Streamlit dashboard
+## 📌 Project Overview
+This system simulates a live online store for EPL merchandise and processes transactions through a scalable big-data pipeline. The data flows through:
 
-## 1. Prereqs
+1. **Kafka Producer** — generates synthetic sales events  
+2. **Kafka Consumer** — processes and writes events into MySQL + Cassandra  
+3. **MySQL** — holds the real-time "live sales" table  
+4. **Cassandra** — stores historical, append-only sales  
+5. **Streamlit Retail Dashboard** — used by analysts to track sales, fan behavior, and recommendation conversions  
+6. **Streamlit Fan Storefront** — a customer-facing store with a real shopping cart and “People Also Bought” recommendation engine  
 
-- Docker & Docker Compose installed
-- Python 3.9+ installed
-- Recommended: a virtualenv for Python code (e.g. `epl_venv`)
+This project models a production-like ecosystem for streaming analytics and fan commerce.
 
-## 2. Start the Docker stack
+## 🧰 Technologies Used
+- Python  
+- Apache Kafka  
+- MySQL  
+- Cassandra  
+- Docker / Docker Compose  
+- Streamlit  
+- Pandas  
 
-From the project root:
+## 📡 Data Pipeline Components
 
-```bash
-cd EPL_Pipeline
-docker compose up -d
+### 🔹 Kafka Producer — `new_producer.py`
+Generates synthetic EPL fan purchase events including fan ID, product, team, region, quantity, and price.
+
+Run:
 ```
-
-Verify containers:
-
-```bash
-docker ps
-```
-
-You should see containers for:
-- kafka
-- zookeeper
-- namenode / datanode
-- mysql
-- cassandra
-- spark-master / spark-worker
-- recommender
-- visualization
-
-## 3. Set up your Python environment (on the host)
-
-```bash
-python3 -m venv epl_venv
-source epl_venv/bin/activate
-pip install kafka-python streamlit
-```
-
-## 4. Run the Kafka producer
-
-```bash
-cd pipelines
-source ../epl_venv/bin/activate   # if not already active
 ./run_producer.sh
 ```
 
-This will generate synthetic fan sales events into Kafka topic `FanSalesTopic`.
+### 🔹 Kafka Consumer — `newest_consumer.py`
+Writes events into:
+- **MySQL** (real-time table)
+- **Cassandra** (historical storage)
 
-## 5. Run the Streamlit dashboard
+Run:
+```
+./run_consumer.sh
+```
 
-In a new terminal:
+### 🔹 MySQL (Live Sales)
+Used for revenue tracking, real-time dashboards, and transaction monitoring.
 
-```bash
-cd EPL_Pipeline/pipelines
-source ../epl_venv/bin/activate
+### 🔹 Cassandra (Historical Sales)
+Used for long-term trend analysis and recommendations.
+
+## 📊 Retail Analytics Dashboard
+Located in:
+```
+retail_dashboard.py
+```
+
+Features:
+- Live sales metrics  
+- Revenue timelines  
+- Product performance  
+- Historical summaries  
+
+Run:
+```
 ./run_dashboard.sh
 ```
 
-Then open: <http://localhost:8501>
-
-The example dashboard currently visualizes synthetic data and gives you a template to connect to Cassandra/MySQL later.
-
-## 6. Stop the stack
-
-From the project root:
-
-```bash
-docker compose down
+## 🛒 Fan Storefront
+Located in:
+```
+fan_store.py
 ```
 
-You now have a clean, reproducible EPL big data environment.
+Features:
+- Browse EPL merchandise  
+- Real shopping cart  
+- Cart-based recommendation engine ("People Also Bought")  
+- Checkout writes back to MySQL/Cassandra  
+
+## 🤖 Recommendation Engine
+Uses **co-purchase frequency modeling**:
+1. Look at items in cart  
+2. Find fans who bought similar items  
+3. Count what else they bought  
+4. Recommend the top items (top 2)
+
+## 📂 File Structure
+```
+.
+├── new_producer.py
+├── newest_consumer.py
+├── retail_dashboard.py
+├── fan_store.py
+├── utils.py
+├── run_producer.sh
+├── run_consumer.sh
+├── run_dashboard.sh
+└── README.md
+```
+
+## 🚀 How to Run
+
+Start services:
+```
+docker compose up -d
+```
+
+Run components:
+```
+./run_producer.sh
+./run_consumer.sh
+./run_dashboard.sh
+```
+
+## 📈 Future Improvements
+- ML-based recommendations  
+- Pricing logic  
+- Inventory simulation  
+- Fan-level personalization  
+
+## 📜 License
+MIT License.

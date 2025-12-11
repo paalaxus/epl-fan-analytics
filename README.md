@@ -94,9 +94,9 @@ EPL_Pipeline/
    ./enter_mysql.sh
    ./enter_cassandra.sh
    ```
-  - Install python depencies in the virtual environment.
-    ``` pip install -r requirements.txt ```
-  - You might have to create your own virtual environment if you have issues. Edit the venv.sh and then run with
+- Install python depencies in the virtual environment.
+    ```pip install -r requirements.txt ```
+- You might have to create your own virtual environment if you have issues. Edit the venv.sh and then run with
     ``` source venv.sh ```
     
 1. Run Setup

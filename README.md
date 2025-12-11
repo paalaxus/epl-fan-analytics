@@ -1,92 +1,55 @@
-# EPL Fan Sales Big Data Pipeline
-A full end-to-end big data project simulating English Premier League (EPL) fan purchase behavior using **Kafka, MySQL, Cassandra, Docker, Streamlit**, and a custom real-time **fan storefront with recommendation engine**.
+# EPL Fan Analytics
 
-This project demonstrates real-time data engineering, distributed storage, streaming analytics, and applied machine learning-style pattern mining for recommendations.
+EPL Fan Analytics is a full end‑to‑end big‑data pipeline that simulates fan purchase behavior for the Premier League (EPL). The system demonstrates real‑time streaming analytics, distributed storage, and a recommendation‑powered fan storefront. It is built using Kafka, MySQL, Cassandra, Docker, Streamlit, and Python.
 
-## 📌 Project Overview
-This system simulates a live online store for EPL merchandise and processes transactions through a scalable big-data pipeline. The data flows through:
+## Project Overview
 
-1. **Kafka Producer** — generates synthetic sales events  
-2. **Kafka Consumer** — processes and writes events into MySQL + Cassandra  
-3. **MySQL** — holds the real-time "live sales" table  
-4. **Cassandra** — stores historical, append-only sales  
-5. **Streamlit Retail Dashboard** — used by analysts to track sales, fan behavior, and recommendation conversions  
-6. **Streamlit Fan Storefront** — a customer-facing store with a real shopping cart and “People Also Bought” recommendation engine  
+- Simulated Fan Store — A mock “EPL merchandise store” where fans can browse products, add items to a shopping cart, and checkout.
+- Real-time Streaming Pipeline — Synthetic purchase events flow through a scalable data pipeline: from event generation to storage and analytics.
+- Live & Historical Storage — Use MySQL for live transactional data and Cassandra for append‑only historical storage.
+- Analytics Dashboard — A Streamlit‑powered dashboard to monitor sales, fan behavior, revenue, and product performance.
+- Recommendation Engine — “People Also Bought” style recommendations based on co‑purchase patterns.
 
-This project models a production-like ecosystem for streaming analytics and fan commerce.
+## Technologies Used
 
-## 🧰 Technologies Used
-- Python  
-- Apache Kafka  
-- MySQL  
-- Cassandra  
-- Docker / Docker Compose  
-- Streamlit  
-- Pandas  
+- Python
+- Apache Kafka
+- MySQL
+- Cassandra
+- Docker & Docker Compose
+- Streamlit
+- Pandas
 
-## 📡 Data Pipeline Components
+## Data Pipeline Components
 
-### 🔹 Kafka Producer — `new_producer.py`
-Generates synthetic EPL fan purchase events including fan ID, product, team, region, quantity, and price.
+### Kafka Producer (`new_producer.py`)
+Generates synthetic fan purchase events.
 
-Run:
-```
-./run_producer.sh
-```
+### Kafka Consumer (`newest_consumer.py`)
+Consumes events and writes them to MySQL and Cassandra.
 
-### 🔹 Kafka Consumer — `newest_consumer.py`
-Writes events into:
-- **MySQL** (real-time table)
-- **Cassandra** (historical storage)
+### MySQL
+Stores live transactional sales data.
 
-Run:
-```
-./run_consumer.sh
-```
+### Cassandra
+Stores append-only historical sales data.
 
-### 🔹 MySQL (Live Sales)
-Used for revenue tracking, real-time dashboards, and transaction monitoring.
+## Features
 
-### 🔹 Cassandra (Historical Sales)
-Used for long-term trend analysis and recommendations.
+### Retail Analytics Dashboard (`retail_dashboard.py`)
+- Transaction metrics
+- Revenue visualizations
+- Product performance
+- Historical summaries
 
-## 📊 Retail Analytics Dashboard
-Located in:
-```
-retail_dashboard.py
-```
+### Fan Storefront (`fan_store.py`)
+- Browse merchandise
+- Shopping cart system
+- “People Also Bought” recommendations
+- Checkout writes transactions to databases
 
-Features:
-- Live sales metrics  
-- Revenue timelines  
-- Product performance  
-- Historical summaries  
+## File Structure
 
-Run:
-```
-./run_dashboard.sh
-```
-
-## 🛒 Fan Storefront
-Located in:
-```
-fan_store.py
-```
-
-Features:
-- Browse EPL merchandise  
-- Real shopping cart  
-- Cart-based recommendation engine ("People Also Bought")  
-- Checkout writes back to MySQL/Cassandra  
-
-## 🤖 Recommendation Engine
-Uses **co-purchase frequency modeling**:
-1. Look at items in cart  
-2. Find fans who bought similar items  
-3. Count what else they bought  
-4. Recommend the top items (top 2)
-
-## 📂 File Structure
 ```
 .
 ├── new_producer.py
@@ -97,28 +60,33 @@ Uses **co-purchase frequency modeling**:
 ├── run_producer.sh
 ├── run_consumer.sh
 ├── run_dashboard.sh
+├── docker-compose.yml
+├── requirements.txt
 └── README.md
 ```
 
-## 🚀 How to Run
+## Setup & Usage
 
-Start services:
-```
-docker compose up -d
-```
+1. Clone the repository  
+2. Start containers:
+   ```
+   docker compose up -d
+   ```
+3. Run services:
+   ```
+   ./run_producer.sh
+   ./run_consumer.sh
+   ./run_dashboard.sh
+   ```
 
-Run components:
-```
-./run_producer.sh
-./run_consumer.sh
-./run_dashboard.sh
-```
+## Future Improvements
 
-## 📈 Future Improvements
-- ML-based recommendations  
-- Pricing logic  
-- Inventory simulation  
-- Fan-level personalization  
+- ML-based recommendation system
+- Dynamic pricing
+- Inventory simulation
+- Fan personalization
+- User authentication
 
-## 📜 License
-MIT License.
+## License
+
+MIT License

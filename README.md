@@ -87,16 +87,17 @@ EPL_Pipeline/
 ## Setup & Usage
 
 
-#needed changes and troubleshooting
+# needed changes and troubleshooting
 - Check all Scripts and change folder names to match yours. ex home/name/downloads.. etc - it can affect hadoop
 - Check that cassandra and mysql have databases and tables created after you do step one.
    ```
    ./enter_mysql.sh
    ./enter_cassandra.sh
-   
    ```
-  - Install python depencies in the virtual environment.  ``` pip install -r requirements.txt ```
-  - You might have to create your own virtual environment if you have issues. Edit the venv.sh and then run with ``` source venv.sh ```
+  - Install python depencies in the virtual environment.
+    ``` pip install -r requirements.txt ```
+  - You might have to create your own virtual environment if you have issues. Edit the venv.sh and then run with
+    ``` source venv.sh ```
     
 1. Run Setup
     ```

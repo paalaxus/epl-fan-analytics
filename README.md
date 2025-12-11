@@ -104,11 +104,12 @@ EPL_Pipeline/
     #Creates all databases, tables, seeds product data.
     ./setup.sh
     ```
-2. Start containers:
+2. Enter your virtual environment
+3.  Start containers:
    ```
    docker compose up -d
    ```
-3. Run services:
+4. Run services:
    ```
    ./run_producer.sh
    ./run_consumer.sh

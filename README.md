@@ -1,6 +1,11 @@
 # EPL Fan Analytics
 
-EPL Fan Analytics is a full end‑to‑end big‑data pipeline that simulates fan purchase behavior for the Premier League (EPL). The system demonstrates real‑time streaming analytics, distributed storage, and a recommendation‑powered fan storefront. It is built using Kafka, MySQL, Cassandra, Docker, Streamlit, and Python.
+<img width="603" height="647" alt="cart" src="https://github.com/user-attachments/assets/b1f06c4d-afe5-402c-922a-dba87d7149d1" />
+<img width="1796" height="697" alt="retail" src="https://github.com/user-attachments/assets/a7492a86-2faf-4f6a-9da6-14ef4889fcf7" />
+<img width="1747" height="460" alt="source2" src="https://github.com/user-attachments/assets/4d810ca6-138c-43e4-a9ff-1740db384813" />
+
+EPL Fan Analytics is a full end‑to‑end big‑data pipeline that simulates fan purchase behavior for the Premier League (EPL). The system demonstrates real‑time stream
+ing analytics, distributed storage, and a recommendation‑powered fan storefront. It is built using Kafka, MySQL, Cassandra, Docker, Streamlit, and Python.
 
 ## Project Overview
 

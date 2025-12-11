@@ -49,6 +49,7 @@ Stores append-only historical sales data.
 - Checkout writes transactions to databases
 
 ## File Structure
+--- 
 ```
 
 EPL_Pipeline/
@@ -82,7 +83,7 @@ EPL_Pipeline/
 ├── epl_consumer_env/ # Local Python virtual environment (optional)
 
 ```
-
+---
 ## Setup & Usage
 
 
